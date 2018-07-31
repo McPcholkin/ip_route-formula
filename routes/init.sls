@@ -1,8 +1,7 @@
-{# manage ip route for 2016 minions  #}
+{# manage ip route for 2016 salt-minions  #}
 
 {% set debug = salt['pillar.get']('routes:debug', False) %}
 
-{% set client_id = salt['grains.get']('id').split('.') | first %}
 {% set backup_dir = salt['pillar.get']('routes:backup_dir', '/root/backup/ip_route') %}
 {% set current_ip_route = salt['cmd.run']('ip route show').replace('\n',';').split(';') %}
 {% set append_routes = salt['pillar.get']('routes:append', False) %}
@@ -30,11 +29,11 @@
 
 {# if check positive #}
 {% if 'match_found' in match_counter %}
-{# Match! not add append route #}
+{# Match found, not need add append route #}
 {% else %}
-{# Not match add append route #}
+{# No match routes found, add append route #}
 
-{# do backup if make changes #}
+{# Create backup if make changes #}
 {% if backup_counter.append('do_backup') %}{% endif %}
 
 add_new_route_{{ route_append_name }}:
@@ -50,9 +49,9 @@ add_new_route_{{ route_append_name }}:
 
 {% endfor %}
 {% endif %}
-{# ---------------------------------------- #}
+{# ----------------------------------- #}
 
-{# ----------- del routes ----------------- #}
+{# ---------- delete routes ---------- #}
 {% if absent_routes %}
 {% for route_absent_name in absent_routes %}
 {# set absent route net  #}
@@ -70,9 +69,9 @@ add_new_route_{{ route_append_name }}:
 
 {# if check positive #}
 {% if 'match_found' in match_counter %}
-{# Match! remove route #}
+{# Match found, remove route #}
 
-{# do backup if make changes #}
+{# Create backup if make changes #}
 {% if backup_counter.append('do_backup') %}{% endif %}
 
 del_route_{{ route_absent_name }}:
@@ -86,7 +85,7 @@ del_route_{{ route_absent_name }}:
       - cmd: do_backup
 
 {% else %}
-{# Not match route exist #}
+{# No match route exist #}
 {# do nothing #}
 {% endif %}
 {% endfor %}
