@@ -30,7 +30,7 @@ routes:
 
 ```
 routes:
-  debug: False
+  debug: True
 ```
 
 ## Change backup directory
